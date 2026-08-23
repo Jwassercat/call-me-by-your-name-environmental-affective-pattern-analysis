@@ -1,0 +1,339 @@
+Workflow:
+Use Codex for stages 1–4:
+1.	Read Human_Clip_Annotation. 
+2.	Access each screenshot_folder_path_local. 
+3.	Sort screenshots by timestamp. 
+4.	Detect background environmental/social elements. 
+5.	Import LAB CSV values. 
+6.	Fill AI_Background_Detection, Screenshot_Manifest, and LAB_Metrics. 
+7.	Optionally generate a neutral visual_modulation_summary_ai. 
+Then bring the updated workbook back to ChatGPT for:
+1.	checking whether AI detections make sense, 
+2.	connecting LAB results with human affective summaries, 
+3.	identifying patterns and exceptions, 
+4.	formulating environmental communication findings, 
+5.	producing article-ready arguments.
+
+Task	Best tool	Why
+Read screenshot folders	Codex	It can access your local folder structure.
+Sort screenshots by timestamp filename	Codex/Python	Mechanical and reproducible.
+Generate Screenshot_Manifest	Codex/Python	Structured file-processing task.
+Import LAB CSVs into LAB_Metrics	Codex/Python	Mechanical data merge by film_id + clip_id.
+Detect background natural/non-nature/social elements from screenshots	Codex/vision model if available	Good for large-scale visual detection, but should stay descriptive.
+Fill AI_Background_Detection	Codex	Batch output into workbook.
+Calculate deviations, summaries, statistics	Codex/Python	Reliable, scalable, reproducible.
+Propose preliminary environmental-affective function	ChatGPT or Codex, but validated by you	Interpretive, should not be fully automated.
+Refine coding categories	ChatGPT + you	Conceptual/methodological task.
+Interpret what patterns mean for environmental communication	You + ChatGPT	Core scholarly argument.
+Write proposal/article sections	ChatGPT + you	Better for discourse, theory, and argumentation.
+
+
+
+Codex prompt:
+You are working on a film scene analysis project. Your task is to update an Excel workbook by performing local file-based screenshot processing, background environmental/social detection, screenshot manifest generation, and LAB CSV import.
+Important boundaries
+•	Do not modify the human-authored content in Human_Clip_Annotation. 
+•	Do not rewrite, correct, interpret, or polish the human input. 
+•	Do not generate final environmental communication findings. 
+•	Do not infer hidden emotion, symbolism, desire, intimacy, memory, or narrative meaning. 
+•	Your role is operational, descriptive, and computational. 
+ 
+Workbook path
+/Users/jemincejem/Downloads/LAB/call_me_by_your_name/environmental_affective_coding_workbook.xlsx
+ 
+LAB parent folder
+/Users/jemincejem/Downloads/LAB/call_me_by_your_name/clips/4_act
+Only read LAB CSV files from these four subfolders:
+visual_trend_setup
+visual_trend_act1
+visual_trend_act2
+visual_trend_act3
+Ignore all other folders and files.
+ 
+Workbook sheets
+The workbook contains:
+1.	Human_Clip_Annotation 
+2.	AI_Background_Detection 
+3.	LAB_Metrics 
+4.	Analysis_Output 
+5.	Controlled_Vocabulary 
+6.	Workflow_Guide 
+If any required output sheet does not exist, create it.
+ 
+TASK 1 — Read Human_Clip_Annotation
+Read every real clip from Human_Clip_Annotation.
+Use these columns:
+•	film_id 
+•	clip_id 
+•	narrative_order 
+•	stage 
+•	time_of_day_human 
+•	screenshot_folder_path_local 
+•	screenshot_review_status 
+•	focal_characters_human 
+•	focal_environmental_element_human 
+•	key_character_action_human 
+•	focal_character_emotion_human 
+•	human_affective_scene_summary 
+Rules:
+•	Use film_id + clip_id as the unique identifier. 
+•	Use narrative_order for chronological ordering. 
+•	Never infer narrative order from clip_id. 
+•	Carry narrative_order into every output sheet. 
+ 
+TASK 2 — Read screenshots
+For every clip:
+Open the folder stored in
+screenshot_folder_path_local
+The screenshots normally follow names like
+clip1_frame_0.0.png
+clip1_frame_12.8.png
+clip1_frame_25.6.png
+The number after
+_frame_
+is the timestamp (seconds).
+For every screenshot folder:
+•	read every png/jpg/jpeg/webp 
+•	parse timestamp 
+•	sort by timestamp numerically 
+•	never sort alphabetically 
+•	if parsing fails, flag the frame 
+•	if the folder does not exist, record it and continue 
+ 
+TASK 3 — Create Screenshot_Manifest
+Create or update a sheet called
+Screenshot_Manifest
+Create one row per screenshot.
+Columns:
+•	film_id 
+•	clip_id 
+•	narrative_order 
+•	screenshot_filename 
+•	screenshot_path 
+•	timestamp_sec 
+•	frame_order_index 
+•	frame_position_ratio 
+•	frame_role_auto 
+•	timestamp_parse_status 
+Definitions:
+frame_order_index
+•	begins at 1 
+frame_position_ratio
+•	normalized from 0 to 1 
+•	if only one frame exists, use 0 
+frame_role_auto
+early
+if ratio < 0.34
+middle
+if 0.34 ≤ ratio < 0.67
+late
+if ratio ≥ 0.67
+timestamp_parse_status
+parsed
+failed
+missing_folder
+ 
+TASK 4 — AI background detection
+Inspect every screenshot chronologically.
+Use all screenshots, not just one.
+Fill the sheet
+AI_Background_Detection
+Columns:
+•	film_id 
+•	clip_id 
+•	narrative_order 
+•	natural_elements_detected_ai 
+•	non_nature_elements_detected_ai 
+•	social_background_detected_ai 
+•	social_pressure_or_environment_ai 
+•	spatial_openness_ai 
+•	publicness_ai 
+•	neglected_background_details_ai 
+•	ai_detection_confidence 
+•	detection_evidence_frames 
+•	detection_notes_ai 
+Rules
+Natural elements
+Detect visible elements such as
+•	trees 
+•	flowers 
+•	meadow 
+•	grass 
+•	lake 
+•	pond 
+•	river 
+•	sea 
+•	mountains 
+•	orchard 
+•	fields 
+•	snow 
+•	sunlight 
+•	sky 
+•	shade 
+•	vegetation 
+Non-natural elements
+Detect visible built elements such as
+•	walls 
+•	roads 
+•	bridges 
+•	buildings 
+•	villas 
+•	windows 
+•	furniture 
+•	pool edges 
+•	chairs 
+•	fences 
+•	dance floor 
+•	vehicles 
+Social background
+Describe only what is visible.
+Examples:
+•	dancing crowd 
+•	public bathers 
+•	passersby 
+•	family members 
+•	passengers 
+•	background figures 
+•	no visible crowd 
+Social environment
+Use cautious descriptions only.
+Examples:
+•	public social field visible 
+•	semi-private domestic space 
+•	crowd creates visible publicness 
+•	no prominent social background detected 
+•	ambiguous 
+Spatial openness
+Use only
+enclosed
+semi-open
+open
+ambiguous
+Publicness
+Use only
+private
+semi-private
+public
+ambiguous
+Neglected background details
+List visible environmental or spatial details not already emphasized in the human annotation.
+Confidence
+Use only
+high
+medium
+low
+Detection evidence
+Record representative screenshot filenames separated by semicolons.
+Detection notes
+Remain descriptive.
+Never infer symbolic meaning.
+ 
+Interpretation boundary
+Never write statements such as
+•	the lake communicates sensual openness 
+•	the pond symbolizes memory 
+•	greenery expresses desire 
+•	walls represent confinement 
+Describe only what is visibly present.
+ 
+TASK 5 — Import LAB CSVs
+Read LAB CSV files only from
+visual_trend_setup
+visual_trend_act1
+visual_trend_act2
+visual_trend_act3
+located under
+/Users/jemincejem/Downloads/LAB/call_me_by_your_name/clips/4_act
+Ignore every other folder.
+Merge by
+film_id + clip_id
+If the CSV does not contain film_id,
+use the workbook value.
+Normalize clip names if necessary.
+Examples
+clip1
+clip01
+Clip 1
+clip_1
+Report unmatched rows.
+Fill
+LAB_Metrics
+Columns
+•	film_id 
+•	clip_id 
+•	narrative_order 
+•	stage 
+•	L_mean 
+•	chroma_mean 
+•	chroma_std 
+•	chroma_p95 
+•	high_chroma_pct 
+•	contrast 
+•	L_dev_stage 
+•	chroma_dev_stage 
+•	contrast_dev_stage 
+•	L_dev_film 
+•	chroma_dev_film 
+•	contrast_dev_film 
+•	lab_import_status 
+•	lab_source_file 
+If stage-level or film-level deviations are missing,
+calculate them.
+If LAB column names differ,
+infer the closest mapping
+and document the mapping.
+ 
+TASK 6 — Create Processing_Log
+Create or update
+Processing_Log
+Record
+•	processing date/time 
+•	workbook path 
+•	LAB parent folder 
+•	included LAB subfolders 
+•	clips processed 
+•	screenshot folders found 
+•	screenshot folders missing 
+•	screenshots processed 
+•	LAB rows imported 
+•	unmatched LAB rows 
+•	timestamp parsing errors 
+•	inferred LAB column mappings 
+•	rows requiring human review 
+ 
+TASK 7 — Save output workbook
+Do not overwrite the original workbook.
+Save a new workbook as
+environmental_affective_coding_workbook_codex_updated.xlsx
+in the same directory.
+ 
+Final report
+After processing, report:
+1.	output workbook path 
+2.	number of clips processed 
+3.	number of screenshots processed 
+4.	number of LAB rows imported 
+5.	missing screenshot folders 
+6.	unmatched LAB rows 
+7.	issues requiring human review 
+ 
+Final reminder
+•	Never modify the human annotation. 
+•	Never generate environmental interpretations. 
+•	Never infer symbolism. 
+•	Use narrative_order as the chronological order. 
+•	Sort screenshots only by numeric timestamp extracted from the filename. 
+•	Read LAB CSV files only from: 
+o	visual_trend_setup 
+o	visual_trend_act1 
+o	visual_trend_act2 
+o	visual_trend_act3 
+
+Introductive video script:
+How do environmental elements and visual parameters, such as chroma and lighting, convey meaning to the audience in Call Me by Your Name?
+First, let us look at the effect of chroma on cinematic mood and character emotion. In one of the film’s iconic scenes, Elio and Oliver swim in an outdoor pool surrounded by enchanting greenery. The pool enables their first bodily contact, where sensory seduction, curiosity, desire, and affection begin to emerge. The scene presents very high chroma, or color intensity, which supports the visual expression of the characters’ emotional vitality.
+However, if we reduce the chromatic quality of this scene, the atmosphere changes immediately. The scene is no longer as emotionally cheerful, sensuous, or visually appealing as before. Instead, it begins to look nostalgic, muted, and sad, while the characters seem deprived of their original vitality. This shows how chroma conveys meaning by shaping our visual perception of atmosphere and character emotion.
+Now, let us look at another scene from the film. In this scene, Marzia indirectly reveals her affection for Elio, while Elio remains silent and avoids responding to her love. They walk through the town in the evening, where the dim lighting seems to help Elio conceal his true feelings. If we alter the chroma and lighting of this scene, what we see becomes slightly bizarre. The quiet, melancholic scene and its ambiguous emotional atmosphere turn into something strangely vivid, relaxed, and almost cheerful, contradicting the emotional tension between the characters.
+Finally, let us return to the first swimming pool scene and focus on the environment itself. Imagine replacing the soothing outdoor setting and surrounding greenery with concrete walls and ceramic tiles, as if the two characters were having their first flirtatious encounter in an indoor Olympic-style swimming pool. The result feels bizarre. The gentle, nuanced, and sensuous atmosphere is almost completely lost.
+Together, these visual experiments show that meaning in film is not produced by characters and plot alone; it is also shaped by color, light, and environment, which guide how viewers feel the emotional world of the story.
+
